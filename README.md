@@ -1,5 +1,7 @@
 # Production-Ready nginx Docker Image with Essential Modules
 
+[![image](https://github.com/sitespanel/nginx-docker/actions/workflows/image.yml/badge.svg)](https://github.com/sitespanel/nginx-docker/actions/workflows/image.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/sitespanel/nginx-docker/badge)](https://scorecard.dev/viewer/?uri=github.com/sitespanel/nginx-docker)
+
 > **SitesPanel image source.** Google Cloud Build builds this image and publishes it to the GitHub Container Registry as `ghcr.io/sitespanel/nginx`; see [CLOUDBUILD.md](CLOUDBUILD.md).
 
 
