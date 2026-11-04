@@ -2,7 +2,7 @@
 
 [![image](https://github.com/sitespanel/nginx-docker/actions/workflows/image.yml/badge.svg)](https://github.com/sitespanel/nginx-docker/actions/workflows/image.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/sitespanel/nginx-docker/badge)](https://scorecard.dev/viewer/?uri=github.com/sitespanel/nginx-docker)
 
-> **SitesPanel image source.** Google Cloud Build builds this image and publishes it to the GitHub Container Registry as `ghcr.io/sitespanel/nginx`; see [CLOUDBUILD.md](CLOUDBUILD.md).
+> **SitesPanel image source.** GitHub Actions builds this image and publishes it to the GitHub Container Registry as `ghcr.io/sitespanel/nginx`; see [BUILD.md](BUILD.md).
 
 
 Official nginx plus the modules it does not ship — **ModSecurity 3**, **Brotli**,
@@ -254,7 +254,7 @@ MIT for this repository's build files. The software it packages keeps its own li
 ## Related Images & Tools
 
 <!-- BEGIN GENERATED: related (from images.yaml in the org .github repository; do not edit by hand) -->
-Every image is built by Google Cloud Build and published to the GitHub Container Registry (`ghcr.io/sitespanel`), with an SBOM attached to each image.
+Every image is built by GitHub Actions and published to the GitHub Container Registry (`ghcr.io/sitespanel`), with an SBOM attached to each image.
 
 | Repository | Images | Description |
 |---|---|---|
