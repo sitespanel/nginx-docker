@@ -1,17 +1,14 @@
 # Production-Ready nginx Docker Image with Essential Modules
 
-> **SitesPanel copy.** This repository is SitesPanel's copy of the image source. SitesPanel builds it with Google Cloud Build and serves it from Artifact Registry (`europe`); see [CLOUDBUILD.md](CLOUDBUILD.md). The Docker Hub publishing of the original repository does not run here.
+> **SitesPanel image source.** SitesPanel builds this image with Google Cloud Build and serves it from Artifact Registry (`europe-docker.pkg.dev/PROJECT/sitespanel-images/nginx`); see [CLOUDBUILD.md](CLOUDBUILD.md). Replace `PROJECT` with SitesPanel's Google Cloud project.
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/morsalin1342/nginx.svg?style=for-the-badge&logo=docker)](https://hub.docker.com/r/morsalin1342/nginx)
-[![GitHub Stars](https://img.shields.io/github/stars/morsalin1342/nginx-docker?style=for-the-badge&logo=github)](https://github.com/morsalin1342/nginx-docker)
-[![License](https://img.shields.io/github/license/morsalin1342/nginx-docker?style=for-the-badge)](https://github.com/morsalin1342/nginx-docker/blob/master/LICENSE)
 
 Official nginx plus the modules it does not ship — **ModSecurity 3**, **Brotli**,
 **Zstandard**, **headers-more**, **GeoIP2**, **VTS** and **OpenTelemetry** — built as
 dynamic modules.
 
 ```bash
-docker pull morsalin1342/nginx:latest
+docker pull europe-docker.pkg.dev/PROJECT/sitespanel-images/nginx:latest
 ```
 
 ## ✨ Why This Image?
@@ -235,9 +232,9 @@ replacement for `nginx:<version>` until you write a directive. Enabling a WAF, o
 detection versus blocking, belongs to whoever runs the server.
 
 **Q: Can I use this with PHP?**
-A: Yes — pair it with [morsalin1342/php](https://hub.docker.com/r/morsalin1342/php) over
+A: Yes — pair it with [europe-docker.pkg.dev/PROJECT/sitespanel-images/php](https://github.com/sitespanel/php-docker) over
 FastCGI. For a single-container Caddy+PHP app server instead, use
-[morsalin1342/frankenphp](https://hub.docker.com/r/morsalin1342/frankenphp).
+[europe-docker.pkg.dev/PROJECT/sitespanel-images/frankenphp](https://github.com/sitespanel/frankenphp-docker).
 
 **Q: How do I add a module that isn't here?**
 A: Fork the repo, pin it to a tag or commit, and add an `--add-dynamic-module` line to the
@@ -255,21 +252,21 @@ MIT for this repository's build files. The software it packages keeps its own li
 ## Related Images & Tools
 
 <!-- BEGIN GENERATED: related (from images.yaml in the org .github repository; do not edit by hand) -->
-Every image is published under `morsalin1342` (personal) and `easydigital` (organization), from the same build.
+Every image is built by Google Cloud Build and published to SitesPanel's Artifact Registry (`europe-docker.pkg.dev/PROJECT/sitespanel-images`), with SLSA provenance and an SBOM per image.
 
 | Repository | Images | Description |
 |---|---|---|
-| [caddy-docker](https://github.com/morsalin1342/caddy-docker) | `morsalin1342/caddy` · `easydigital/caddy` | Standalone Caddy with WAF, rate limiting & caching |
-| [frankenphp-docker](https://github.com/morsalin1342/frankenphp-docker) | `morsalin1342/frankenphp` · `easydigital/frankenphp` | Caddy + PHP app server in one container |
-| [php-docker](https://github.com/morsalin1342/php-docker) | `morsalin1342/php` · `easydigital/php` | Traditional PHP-FPM & CLI images |
-| [apache-docker](https://github.com/morsalin1342/apache-docker) | `morsalin1342/apache` · `easydigital/apache` | Apache as a static server or php-fpm application server, no PHP inside |
+| [caddy-docker](https://github.com/sitespanel/caddy-docker) | `sitespanel-images/caddy` | Standalone Caddy with WAF, rate limiting & caching |
+| [frankenphp-docker](https://github.com/sitespanel/frankenphp-docker) | `sitespanel-images/frankenphp` | Caddy + PHP app server in one container |
+| [php-docker](https://github.com/sitespanel/php-docker) | `sitespanel-images/php` | Traditional PHP-FPM & CLI images |
+| [apache-docker](https://github.com/sitespanel/apache-docker) | `sitespanel-images/apache` | Apache as a static server or php-fpm application server, no PHP inside |
 <!-- END GENERATED: related -->
 
 ---
 
 ## Feedback and Issues
 
-If you have suggestions, find a bug, or want to request a new module, please [open an issue](https://github.com/morsalin1342/nginx-docker/issues) on the GitHub repository.
+If you have suggestions, find a bug, or want to request a new module, please [open an issue](https://github.com/sitespanel/nginx-docker/issues) on the GitHub repository.
 
 ---
 

@@ -38,10 +38,9 @@ README lists what is NGINX Plus only and cannot be added to an open-source build
 ```
 .
 ├── Dockerfile                 # Three stages: libmodsecurity, modules, final image
-├── .github/workflows/         # CI/CD pipeline
+├── cloudbuild.yaml             # Cloud Build: build, scan, SBOM, push with provenance
+├── cloudbuild-pr.yaml          # Cloud Build: pull-request build and scan, no push
 ├── README.md                  # GitHub README
-├── README.dockerhub.md        # Personal Docker Hub description
-└── README.dockerhub-org.md    # Org Docker Hub description
 ```
 
 ## Version Upgrades
