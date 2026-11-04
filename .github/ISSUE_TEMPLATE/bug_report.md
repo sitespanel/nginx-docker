@@ -7,7 +7,7 @@ assignees: ''
 ---
 
 **Image tag(s) affected**
-<!-- e.g. europe-docker.pkg.dev/PROJECT/sitespanel-images/nginx:1.30.5 -->
+<!-- e.g. ghcr.io/sitespanel/nginx:1.30.5 -->
 
 **Describe the bug**
 <!-- A clear description of what's wrong -->

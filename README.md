@@ -1,6 +1,6 @@
 # Production-Ready nginx Docker Image with Essential Modules
 
-> **SitesPanel image source.** SitesPanel builds this image with Google Cloud Build and serves it from Artifact Registry (`europe-docker.pkg.dev/PROJECT/sitespanel-images/nginx`); see [CLOUDBUILD.md](CLOUDBUILD.md). Replace `PROJECT` with SitesPanel's Google Cloud project.
+> **SitesPanel image source.** Google Cloud Build builds this image and publishes it to the GitHub Container Registry as `ghcr.io/sitespanel/nginx`; see [CLOUDBUILD.md](CLOUDBUILD.md).
 
 
 Official nginx plus the modules it does not ship — **ModSecurity 3**, **Brotli**,
@@ -8,7 +8,7 @@ Official nginx plus the modules it does not ship — **ModSecurity 3**, **Brotli
 dynamic modules.
 
 ```bash
-docker pull europe-docker.pkg.dev/PROJECT/sitespanel-images/nginx:latest
+docker pull ghcr.io/sitespanel/nginx:latest
 ```
 
 ## ✨ Why This Image?
@@ -232,9 +232,9 @@ replacement for `nginx:<version>` until you write a directive. Enabling a WAF, o
 detection versus blocking, belongs to whoever runs the server.
 
 **Q: Can I use this with PHP?**
-A: Yes — pair it with [europe-docker.pkg.dev/PROJECT/sitespanel-images/php](https://github.com/sitespanel/php-docker) over
+A: Yes — pair it with [ghcr.io/sitespanel/php](https://github.com/sitespanel/php-docker) over
 FastCGI. For a single-container Caddy+PHP app server instead, use
-[europe-docker.pkg.dev/PROJECT/sitespanel-images/frankenphp](https://github.com/sitespanel/frankenphp-docker).
+[ghcr.io/sitespanel/frankenphp](https://github.com/sitespanel/frankenphp-docker).
 
 **Q: How do I add a module that isn't here?**
 A: Fork the repo, pin it to a tag or commit, and add an `--add-dynamic-module` line to the
@@ -252,7 +252,7 @@ MIT for this repository's build files. The software it packages keeps its own li
 ## Related Images & Tools
 
 <!-- BEGIN GENERATED: related (from images.yaml in the org .github repository; do not edit by hand) -->
-Every image is built by Google Cloud Build and published to SitesPanel's Artifact Registry (`europe-docker.pkg.dev/PROJECT/sitespanel-images`), with SLSA provenance and an SBOM per image.
+Every image is built by Google Cloud Build and published to the GitHub Container Registry (`ghcr.io/sitespanel`), with an SBOM attached to each image.
 
 | Repository | Images | Description |
 |---|---|---|
