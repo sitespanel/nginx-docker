@@ -29,7 +29,7 @@ steps:
       - --label=org.opencontainers.image.source=https://github.com/sitespanel/nginx-docker
       - --label=org.opencontainers.image.revision=$COMMIT_SHA
       - --label=dev.sitespanel.build.id=$BUILD_ID
-      - --label=org.opencontainers.image.description=SitesPanel nginx (edge and origin, ModSecurity and the OWASP Core Rule Set) image
+      - --label=org.opencontainers.image.description=SitesPanel nginx image for the site edge and origin: ModSecurity 3 with the OWASP Core Rule Set, Brotli, zstd and GeoIP2.
       - --tag=${_REGISTRY}/nginx:$SHORT_SHA
       - --tag=${_REGISTRY}/nginx:latest
       - .
