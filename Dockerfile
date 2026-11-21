@@ -54,7 +54,7 @@
 # Debian rather than Alpine: ModSecurity's dependency set — yajl, lmdb, libxml2,
 # curl — is better served by glibc.
 
-ARG NGINX_VERSION=1.30.5
+ARG NGINX_VERSION=1.30.7
 ARG DEBIAN_RELEASE=trixie
 
 # ─────────────────────────────────────────────────────────────────────────────
