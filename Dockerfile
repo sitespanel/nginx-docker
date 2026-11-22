@@ -93,6 +93,9 @@ RUN ./build.sh \
 FROM debian:${DEBIAN_RELEASE}-slim AS modules
 
 ARG NGINX_VERSION
+# SHA-256 of nginx-${NGINX_VERSION}.tar.gz, taken after `gpg --verify` of its .asc against nginx.org/keys
+# (good signature, release key D6786CE303D9A9022998DC6CC8464D549AF75C0A, 2026-11-23). Bump with the version.
+ARG NGINX_SHA256=2565b5c837050e958f70fb0f73c48e2bca4542ad349fd356f46fb0c72610bc6e
 ARG MODSECURITY_NGINX_VERSION=v1.0.4
 ARG HEADERS_MORE_VERSION=v0.40
 ARG GEOIP2_VERSION=3.4
@@ -127,7 +130,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=modsecurity /usr/local/modsecurity /usr/local/modsecurity
 WORKDIR /usr/src
 
-RUN curl -fsSL "https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" | tar -xz \
+RUN curl -fsSL -o nginx.tar.gz "https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" \
+    && echo "${NGINX_SHA256}  nginx.tar.gz" | sha256sum -c - \
+    && tar -xzf nginx.tar.gz && rm nginx.tar.gz \
     && git clone --branch "${MODSECURITY_NGINX_VERSION}" --depth 1 \
         https://github.com/owasp-modsecurity/ModSecurity-nginx.git \
     && git clone --branch "${HEADERS_MORE_VERSION}" --depth 1 \
@@ -191,10 +196,13 @@ RUN mkdir -p out && cd out \
 #
 # So: our own libzstd, PIC, and the static path it already prefers.
 ARG ZSTD_VERSION=1.5.7
+# SHA-256 of the release archive, as upstream publishes it (zstd-${ZSTD_VERSION}.tar.gz.sha256). Bump with the version.
+ARG ZSTD_SHA256=eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3
 
 WORKDIR /usr/src
-RUN curl -fsSL "https://github.com/facebook/zstd/releases/download/v${ZSTD_VERSION}/zstd-${ZSTD_VERSION}.tar.gz" \
-        | tar -xz \
+RUN curl -fsSL -o zstd.tar.gz "https://github.com/facebook/zstd/releases/download/v${ZSTD_VERSION}/zstd-${ZSTD_VERSION}.tar.gz" \
+    && echo "${ZSTD_SHA256}  zstd.tar.gz" | sha256sum -c - \
+    && tar -xzf zstd.tar.gz && rm zstd.tar.gz \
     && make -C "zstd-${ZSTD_VERSION}/lib" -j"$(nproc)" libzstd.a CFLAGS="-O3 -fPIC" \
     && mkdir -p /usr/local/zstd/lib /usr/local/zstd/include \
     && cp "zstd-${ZSTD_VERSION}/lib/libzstd.a" /usr/local/zstd/lib/ \
@@ -275,6 +283,8 @@ FROM nginx:${NGINX_VERSION}-${DEBIAN_RELEASE}
 
 ARG NGINX_VERSION
 ARG CRS_VERSION=v4.30.0
+# SHA-256 of the tag archive from GitHub (2026-11-23). Bump with the version.
+ARG CRS_SHA256=a4bb3688ef6205b64471a9ccbf0d7b024eb8edf39b97c6f6c0006e7a948f8550
 
 LABEL org.opencontainers.image.title="nginx" \
       org.opencontainers.image.description="nginx with ModSecurity 3, Brotli, headers-more and GeoIP2 as dynamic modules" \
@@ -343,12 +353,30 @@ RUN ldconfig /usr/local/modsecurity/lib
 # site-specific and not something upstream ships. Turning it on, and choosing
 # detection or blocking, belongs to whoever runs the server.
 #
-# To use it: load the module, point modsecurity_rules_file at a file that
-# includes crs-setup.conf and rules/*.conf, and set `modsecurity on;`.
+# To use it: set `modsecurity on;` and point modsecurity_rules_file at
+# /etc/nginx/modsecurity/main.conf (made below).
 RUN mkdir -p /etc/nginx/modsecurity \
-    && curl -fsSL "https://github.com/coreruleset/coreruleset/archive/refs/tags/${CRS_VERSION}.tar.gz" \
-        | tar -xz -C /etc/nginx/modsecurity --strip-components=1 \
+    && curl -fsSL -o /tmp/crs.tar.gz "https://github.com/coreruleset/coreruleset/archive/refs/tags/${CRS_VERSION}.tar.gz" \
+    && echo "${CRS_SHA256}  /tmp/crs.tar.gz" | sha256sum -c - \
+    && tar -xzf /tmp/crs.tar.gz -C /etc/nginx/modsecurity --strip-components=1 && rm /tmp/crs.tar.gz \
     && cp /etc/nginx/modsecurity/crs-setup.conf.example /etc/nginx/modsecurity/crs-setup.conf
+
+# ModSecurity's own base configuration, which the engine needs before any rule set: without it the
+# defaults apply, and SecRequestBodyAccess stays Off, so no rule ever sees a request body. These are
+# the files of the libmodsecurity release built above: modsecurity.conf (from modsecurity.conf-recommended,
+# its engine left at DetectionOnly) and unicode.mapping, which it names. main.conf ties the base
+# configuration and CRS together; it is the file to give modsecurity_rules_file. Nothing loads it.
+COPY --from=modsecurity /usr/src/ModSecurity/modsecurity.conf-recommended /etc/nginx/modsecurity/modsecurity.conf
+COPY --from=modsecurity /usr/src/ModSecurity/unicode.mapping /etc/nginx/modsecurity/unicode.mapping
+RUN grep -q "^SecRequestBodyAccess On" /etc/nginx/modsecurity/modsecurity.conf \
+    && grep -q "^SecRuleEngine DetectionOnly" /etc/nginx/modsecurity/modsecurity.conf \
+    && grep -q "^SecUnicodeMapFile unicode.mapping" /etc/nginx/modsecurity/modsecurity.conf \
+    && printf '%s\n' \
+        "# The file for modsecurity_rules_file: ModSecurity's base configuration, then the OWASP Core Rule Set." \
+        "Include /etc/nginx/modsecurity/modsecurity.conf" \
+        "Include /etc/nginx/modsecurity/crs-setup.conf" \
+        "Include /etc/nginx/modsecurity/rules/*.conf" \
+        > /etc/nginx/modsecurity/main.conf
 
 # Load the modules, and prove they load, before the image is published.
 #
