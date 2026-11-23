@@ -63,6 +63,9 @@ ARG DEBIAN_RELEASE=trixie
 FROM debian:${DEBIAN_RELEASE}-slim AS modsecurity
 
 ARG MODSECURITY_VERSION=v3.0.17
+# The commit that tag points at (git ls-remote, 2026-11-23). A tag can be moved; the build refuses a checkout
+# that is not this commit. Bump it with the version.
+ARG MODSECURITY_COMMIT=1925753989ccce977cdaae417b55c9726c7cf02c
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         autoconf automake build-essential ca-certificates git libtool pkg-config \
@@ -73,7 +76,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # --depth 1 with the submodules: ModSecurity vendors its parser generators, and
 # a full history clone is roughly ten times the download for no benefit.
 RUN git clone --branch "${MODSECURITY_VERSION}" --depth 1 --recursive \
-        https://github.com/owasp-modsecurity/ModSecurity /usr/src/ModSecurity
+        https://github.com/owasp-modsecurity/ModSecurity /usr/src/ModSecurity \
+    && test "$(git -C /usr/src/ModSecurity rev-parse HEAD)" = "${MODSECURITY_COMMIT}"
 
 WORKDIR /usr/src/ModSecurity
 RUN ./build.sh \
@@ -106,6 +110,16 @@ ARG ZSTD_MODULE_VERSION=0.1.1
 ARG FANCYINDEX_VERSION=v0.6.0
 ARG CACHE_PURGE_VERSION=3.0.3
 ARG UPLOAD_PROGRESS_VERSION=v0.9.4
+# The commit each module tag above points at (git ls-remote, 2026-11-23), as "<folder> <commit>". A tag can be
+# moved; the build refuses a checkout that is not the pinned commit. Bump a line with its version.
+ARG MODULE_COMMITS="ModSecurity-nginx 3f4b57df10ce43b1f1c722141f7621dc64838be8 \
+headers-more-nginx-module 0bf283ff92017acd616814b0e5153e0ccf93e2c9 \
+ngx_http_geoip2_module cbaa35461c62a99d2577e6bae3273492502d8769 \
+nginx-module-vts 38b8612527ecb003ea15cefe934f302cf1a7c27e \
+zstd-nginx-module 6be764e2bed04f889af824eff2d4dd737ebdab5a \
+ngx-fancyindex 70311f239ec1e88ff79c669d126d08532ddb8554 \
+ngx_cache_purge c8d93dea1e22331306f1e8315b7e7bed5b044ead \
+nginx-upload-progress-module 463d60b5024d3870280d3a63b1568a2676e24a8c"
 # ngx_brotli publishes no releases, so this is a commit. Pinned rather than
 # tracking master: an unpinned dependency in a WAF-bearing gateway is a change
 # nobody reviewed arriving in a tag we already published.
@@ -151,7 +165,13 @@ RUN curl -fsSL -o nginx.tar.gz "https://nginx.org/download/nginx-${NGINX_VERSION
         https://github.com/masterzen/nginx-upload-progress-module.git \
     && git clone --recursive https://github.com/google/ngx_brotli.git \
     && git -C ngx_brotli checkout "${NGX_BROTLI_COMMIT}" \
-    && git -C ngx_brotli submodule update --init --recursive
+    && git -C ngx_brotli submodule update --init --recursive \
+    && set -- ${MODULE_COMMITS} \
+    && while [ $# -ge 2 ]; do \
+           got="$(git -C "$1" rev-parse HEAD)"; \
+           [ "$got" = "$2" ] || { echo "$1 is at $got, not the pinned $2"; exit 1; }; \
+           shift 2; \
+       done
 
 # Brotli's bundled libbrotli, built before nginx configures against it.
 #
