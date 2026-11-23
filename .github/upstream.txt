@@ -1,0 +1,9 @@
+# ARG source (see .github/upstream-check.py)
+NGINX_VERSION dockerhub:library/nginx:1.30.:-trixie
+MODSECURITY_VERSION github:owasp-modsecurity/ModSecurity
+MODSECURITY_NGINX_VERSION github:owasp-modsecurity/ModSecurity-nginx
+HEADERS_MORE_VERSION github:openresty/headers-more-nginx-module
+VTS_VERSION github:vozlt/nginx-module-vts
+FANCYINDEX_VERSION github:aperezdc/ngx-fancyindex
+ZSTD_VERSION github:facebook/zstd
+CRS_VERSION github:coreruleset/coreruleset
