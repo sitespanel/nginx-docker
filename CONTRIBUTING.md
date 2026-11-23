@@ -31,7 +31,7 @@ README lists what is NGINX Plus only and cannot be added to an open-source build
    docker run --rm test-nginx nginx -V
    docker run --rm test-nginx nginx -t
    ```
-5. Open a PR against `master` with a clear description
+5. Open a PR against `main` with a clear description
 
 ## Project Structure
 
