@@ -146,7 +146,7 @@ customer's server at start time.
 
 ## Tags
 
-`<nginx-version>` and `latest`, published on push to `master`.
+`<nginx-version>` and `latest`, published on push to `main`.
 
 The tag names the **upstream nginx release**, not a build of this repository — so it is
 republished when the Dockerfile changes. A module bump or a CRS update can land under an
