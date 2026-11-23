@@ -295,15 +295,16 @@ LABEL org.opencontainers.image.title="nginx" \
 # builder; only the shared objects are needed here. `acl` (setfacl, getfacl) lets
 # an entrypoint grant a user access to a directory without changing its owner.
 #
-# libexpat1 and libbrotli1 are upgraded to Debian's security releases
-# (libexpat1 2.9.0-1~deb13u1, libbrotli1 1.1.0-2+deb13u1; high CVEs in the
-# versions the official base image still ships, 2026-10-27). apt, libapt-pkg7.0 (3.0.4)
-# and zlib1g (1:1.3.dfsg+really1.3.1-1+deb13u1) are upgraded the same way (high CVEs
-# found by the image manifest's scan, 2026-11-08). Drop the line when the base image
-# carries them.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Every Debian security fix released after the official base image was built is
+# applied first (`apt-get upgrade`), so the image does not wait for the next
+# upstream rebuild. Naming the packages one by one (libexpat1, libbrotli1, apt,
+# libapt-pkg7.0, zlib1g before) missed the next ones: krb5 and others on
+# 2026-11-23, which the scan's HIGH gate stopped.
+# hadolint ignore=DL3005
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends \
         acl libcurl4 libgeoip1 liblmdb0 libmaxminddb0 libxml2 libyajl2 libzstd1 \
-    && apt-get install -y --no-install-recommends --only-upgrade libexpat1 libbrotli1 apt libapt-pkg7.0 zlib1g \
     && rm -rf /var/lib/apt/lists/*
 
 # OpenTelemetry, from nginx's own package repository rather than built here.
