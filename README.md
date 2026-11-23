@@ -210,9 +210,11 @@ for that job.
 ## ❓ FAQ
 
 **Q: How do I turn the WAF on?**
-A: Load the module (already loaded), point `modsecurity_rules_file` at a file that includes
-`crs-setup.conf` and `rules/*.conf`, then set `modsecurity on;`. Start in `DetectionOnly`,
-read your logs, and only then switch to blocking — CRS has a real false-positive cost against
+A: The module is already loaded. Add `modsecurity on;` and
+`modsecurity_rules_file /etc/nginx/modsecurity/main.conf;`. `main.conf` includes ModSecurity's base
+configuration (`modsecurity.conf`, which turns on request-body inspection and leaves the engine at
+`DetectionOnly`), then `crs-setup.conf` and the Core Rule Set. Read your logs in `DetectionOnly`,
+and only then switch to blocking (`SecRuleEngine On` in your own copy of `modsecurity.conf`) — CRS has a real false-positive cost against
 application admin panels, WordPress's `/wp-admin` in particular.
 
 **Q: I replaced `/etc/nginx/nginx.conf` and all the modules vanished. Why?**
